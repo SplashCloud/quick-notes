@@ -29,7 +29,13 @@ npm run build
 npm run package
 ```
 
-这个应用面向 macOS 设计，打包配置默认生成 macOS 应用目录。
+这个应用面向 macOS 设计，打包配置默认生成 macOS 应用目录。真正的 `.dmg`、签名、公证和安装体验仍然需要在 macOS 上验证。
+
+## 包体积
+
+Electron 应用会自带 Chromium 和 Node.js 运行时，所以 macOS 安装包不会像普通网页一样只有几 MB。当前配置已经把 React、Vite、TypeScript、Electron 等全部放在 `devDependencies`，生产依赖为空，并开启 `asar` 和最高压缩，避免把源码构建依赖打进应用。
+
+如果看到 600MB 级别，先确认看的是不是整个开发目录或未压缩的 `.app` 目录，而不是最终 `.dmg`。开发目录里的 `node_modules` 本身就会很大，不能作为用户安装包体积判断依据。
 
 ## 发布给普通用户下载
 
@@ -78,8 +84,8 @@ npm run dist:mac
 
 产物会在 `dist/` 目录里，重点是：
 
-- `快捷便利贴-0.1.0-arm64.dmg`
-- `快捷便利贴-0.1.0-arm64.zip`
+- `Quick Notes-0.1.0-arm64.dmg`
+- `Quick Notes-0.1.0-arm64.zip`
 
 ### 5. 发布到 GitHub Release
 

@@ -1,5 +1,5 @@
 import { CalendarDays, ChevronLeft, ChevronRight, Edit3, Plus, Trash2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { NotesState, StickyNote } from "./types";
 
 const colors = ["#fff2a8", "#ffd6d6", "#d8f5d2", "#d7ecff", "#eadcff", "#ffe2bf"];
@@ -93,7 +93,7 @@ function MainWindow({ state }: { state: NotesState }) {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <h1>快捷便利贴</h1>
+          <h1>Quick Notes</h1>
           <p>{formatHotkey(state.hotkey)} 新建便利贴</p>
         </div>
         <button className="primary-button" onClick={() => window.notesApi.createNoteWindow()}>
@@ -195,9 +195,14 @@ function NoteCard({ note }: { note: StickyNote }) {
 function NoteWindow({ noteId, state }: { noteId: string; state: NotesState }) {
   const note = state.notes.find((item) => item.id === noteId);
   const [draft, setDraft] = useState("");
+  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (note) setDraft(note.content);
+  }, [note?.id]);
+
+  useEffect(() => {
+    editorRef.current?.focus();
   }, [note?.id]);
 
   useEffect(() => {
@@ -234,8 +239,10 @@ function NoteWindow({ noteId, state }: { noteId: string; state: NotesState }) {
         </div>
       </header>
       <textarea
+        ref={editorRef}
         className="sticky-editor"
         value={draft}
+        autoFocus
         spellCheck={false}
         placeholder="写点什么..."
         onChange={(event) => setDraft(event.target.value)}

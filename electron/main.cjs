@@ -68,7 +68,7 @@ function createMainWindow() {
     height: 760,
     minWidth: 860,
     minHeight: 620,
-    title: "快捷便利贴",
+    title: "Quick Notes",
     backgroundColor: "#f6f4ec",
     titleBarStyle: "hiddenInset",
     webPreferences: {
@@ -117,6 +117,7 @@ function createNoteWindow(id) {
 
   const existing = noteWindows.get(note.id);
   if (existing && !existing.isDestroyed()) {
+    if (process.platform === "darwin") app.focus({ steal: true });
     existing.show();
     existing.focus();
     return note;
@@ -127,6 +128,7 @@ function createNoteWindow(id) {
     height: note.height,
     x: note.x,
     y: note.y,
+    show: false,
     minWidth: 260,
     minHeight: 240,
     title: "便利贴",
@@ -144,6 +146,12 @@ function createNoteWindow(id) {
 
   noteWindows.set(note.id, win);
   loadRenderer(win, `#/note/${note.id}`);
+
+  win.once("ready-to-show", () => {
+    if (process.platform === "darwin") app.focus({ steal: true });
+    win.show();
+    win.focus();
+  });
 
   const saveBounds = () => {
     if (win.isDestroyed()) return;
@@ -203,6 +211,7 @@ app.whenReady().then(() => {
   createMainWindow();
 
   globalShortcut.register(hotkey, () => {
+    if (process.platform === "darwin") app.focus({ steal: true });
     createNoteWindow();
   });
 
